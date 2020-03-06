@@ -12,7 +12,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, accuracy_score
 import os
-''' посмотреть какие файлы есть в папке
+''' посмотреть какие файлы есть в папке полезно для юпитера 
 for dirname, _, sfilenames in os.walk('/kaggle/input'):
     for filename in filenames:
         print(os.path.join(dirname, filename))'''
