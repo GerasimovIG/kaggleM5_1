@@ -12,14 +12,12 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, accuracy_score
 import os
-''' посмотреть какие файлы есть в папке полезно для юпитера 
-for dirname, _, sfilenames in os.walk('/kaggle/input'):
-    for filename in filenames:
-        print(os.path.join(dirname, filename))'''
         
-gender_submission = pd.read_csv('gender_submission.csv', engine='python')
-test = pd.read_csv('test.csv', engine='python')
-train = pd.read_csv('train.csv', engine='python')
+sell_prices = pd.read_csv(r'C:\Users\Ilia\Documents\git\kaggleM5_data\sell_prices.csv', engine='python')
+calendar = pd.read_csv(r'C:\Users\Ilia\Documents\git\kaggleM5_data\calendar.csv', engine='python')
+submission_format = pd.read_csv(r'C:\Users\Ilia\Documents\git\kaggleM5_data\sample_submission.csv', engine='python')
+train = pd.read_csv(r'C:\Users\Ilia\Documents\git\kaggleM5_data\sales_train_validation.csv', engine='python')
+
 
 
 train = train.drop(labels = ["Name", "Ticket", "Cabin"],axis = 1)
