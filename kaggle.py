@@ -12,6 +12,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, accuracy_score
 import os
+<<<<<<< HEAD
 ''' посмотреть какие файлы есть в папке
 for dirname, _, sfilenames in os.walk('/kaggle/input'):
     for filename in filenames:
@@ -20,6 +21,16 @@ for dirname, _, sfilenames in os.walk('/kaggle/input'):
 gender_submission = pd.read_csv('gender_submission.csv', engine='python')
 test = pd.read_csv('test.csv', engine='python')
 train = pd.read_csv('train.csv', engine='python')
+=======
+  
+path = r"..\kaggleM5_data"
+      
+sell_prices = pd.read_csv(os.path.join(path, r"sell_prices.csv")) 
+calendar =  pd.read_csv(os.path.join(path, r"calendar.csv"))
+submission_format = pd.read_csv(os.path.join(path, r"sample_submission.csv")) 
+train = pd.read_csv(os.path.join(path, r"sales_train_validation.csv")) 
+
+>>>>>>> ffc59bb... changed name of data folder
 
 
 train = train.drop(labels = ["Name", "Ticket", "Cabin"],axis = 1)
