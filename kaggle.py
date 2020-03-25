@@ -36,3 +36,9 @@ def reduce_mem_usage(df, verbose=True):
     end_mem = df.memory_usage().sum() / 1024**2
     if verbose: print('Mem. usage decreased to {:5.2f} Mb ({:.1f}% reduction)'.format(end_mem, 100 * (start_mem - end_mem) / start_mem))
     return df
+
+path = "../kaggleM5_data"
+
+calendar = pd.read_csv(os.path.join(path, "calendar.csv"))
+selling_prices = pd.read_csv(os.path.join(path, "sell_prices.csv"))
+sample_submission = pd.read_csv(os.path.join(path, "sample_submission.csv"))
