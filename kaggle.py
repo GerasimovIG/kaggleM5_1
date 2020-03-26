@@ -202,3 +202,98 @@ import tensorflow.keras as keras
 from tensorflow.keras import regularizers
 from tensorflow.keras.layers import Dense, Input, Embedding, Dropout, concatenate, Flatten
 from tensorflow.keras.models import Model
+
+def create_model(lr=0.002):
+    tf.random.set_seed(173)
+
+    tf.keras.backend.clear_session()
+    gc.collect()
+
+    # Dense input
+    dense_input = Input(shape=(len(dense_cols), ), name='dense1')
+
+    # Embedding input
+    wday_input = Input(shape=(1,), name='wday')
+    month_input = Input(shape=(1,), name='month')
+    year_input = Input(shape=(1,), name='year')
+    event_name_1_input = Input(shape=(1,), name='event_name_1')
+    event_type_1_input = Input(shape=(1,), name='event_type_1')
+    event_name_2_input = Input(shape=(1,), name='event_name_2')
+    event_type_2_input = Input(shape=(1,), name='event_type_2')
+    item_id_input = Input(shape=(1,), name='item_id')
+    dept_id_input = Input(shape=(1,), name='dept_id')
+    store_id_input = Input(shape=(1,), name='store_id')
+    cat_id_input = Input(shape=(1,), name='cat_id')
+    state_id_input = Input(shape=(1,), name='state_id')
+
+    wday_emb = Flatten()(Embedding(7, 1)(wday_input))
+    month_emb = Flatten()(Embedding(12, 1)(month_input))
+    year_emb = Flatten()(Embedding(6, 1)(year_input))
+    event_name_1_emb = Flatten()(Embedding(31, 1)(event_name_1_input))
+    event_type_1_emb = Flatten()(Embedding(5, 1)(event_type_1_input))
+    event_name_2_emb = Flatten()(Embedding(5, 1)(event_name_2_input))
+    event_type_2_emb = Flatten()(Embedding(5, 1)(event_type_2_input))
+
+    item_id_emb = Flatten()(Embedding(3049, 3)(item_id_input))
+    dept_id_emb = Flatten()(Embedding(7, 1)(dept_id_input))
+    store_id_emb = Flatten()(Embedding(10, 1)(store_id_input))
+    cat_id_emb = Flatten()(Embedding(3, 1)(cat_id_input))
+    state_id_emb = Flatten()(Embedding(3, 1)(state_id_input))
+
+    # Combine dense and embedding parts and add dense layers. Exit on linear scale.
+    x = concatenate([dense_input, wday_emb, month_emb, year_emb, 
+                     event_name_1_emb, event_type_1_emb, 
+                     event_name_2_emb, event_type_2_emb, 
+                     item_id_emb, dept_id_emb, store_id_emb,
+                     cat_id_emb, state_id_emb])
+    x = Dense(150, activation="tanh")(x)
+    x = Dense(75, activation="tanh")(x)
+    x = Dense(10, activation="tanh")(x)
+    outputs = Dense(1, activation="linear", name='output')(x)
+
+    inputs = {"dense1": dense_input, "wday": wday_input, "month": month_input, "year": year_input, 
+              "event_name_1": event_name_1_input, "event_type_1": event_type_1_input,
+              "event_name_2": event_name_2_input, "event_type_2": event_type_2_input,
+              "item_id": item_id_input, "dept_id": dept_id_input, "store_id": store_id_input, 
+              "cat_id": cat_id_input, "state_id": state_id_input}
+
+    # Connect input and output
+    model = Model(inputs, outputs)
+
+    model.compile(loss=keras.losses.mean_squared_error,
+                  metrics=["mse"],
+                  optimizer=keras.optimizers.RMSprop(learning_rate=lr))
+    return model
+
+model = create_model(0.0002)
+model.summary()
+keras.utils.plot_model(model, 'model.png', show_shapes=True)
+
+history = model.fit(X_train, 
+                    y_train,
+                    batch_size=10000,
+                    epochs=30,
+                    shuffle=True,
+                    validation_data=valid)
+
+plt.plot(history.history['loss'])
+plt.plot(history.history['val_loss'])
+plt.title('model loss')
+plt.ylabel('loss')
+plt.xlabel('epoch')
+plt.legend(['train', 'valid'], loc='upper left')
+plt.show()
+
+history.history["val_loss"]
+model.save('model.h5')
+
+pred = model.predict(X_test, batch_size=10000)
+
+test["demand"] = pred.clip(0)
+submission = test.pivot(index="id", columns="F", values="demand").reset_index()[sample_submission.columns]
+submission = sample_submission[["id"]].merge(submission, how="left", on="id")
+submission.head()
+
+submission[sample_submission.id=="FOODS_1_001_TX_2_validation"].head()
+
+submission.to_csv("submission.csv", index=False)
